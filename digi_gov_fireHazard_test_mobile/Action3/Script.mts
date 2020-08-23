@@ -26,11 +26,23 @@ wait 5
 
 AIUtil.FindTextBlock("Submit").Click
 
-' Get the text above as an anchor to "ticket ID" text
-Set anchor = AIUtil.FindTextBlock("One of our officers will be in contact")
+IF AIUtil.FindTextBlock("Ticket Details").Exist THEN
+	' Get the text above as an anchor to "ticket ID" text
+	Set anchor = AIUtil.FindTextBlock("One of our officers will be in contact")
+	'Get the text of "Ticket ID"
+	ticketID=AIUtil.FindTextBlock(micAnyText,micWithAnchorAbove,anchor).GetText()
+	
+	reporter.ReportEvent micPass, "Report Submit Succeed", "Succeed to report a new firehazard report: ticket details is shown"
+Else 
+	reporter.ReportEvent micFail, "Report Submit Failure", "Failed to report a new firehazard report: ticket details is not shown"
+	ExitTest
+End If
 
-'Get the text of "Ticket ID"
-ticketID=AIUtil.FindTextBlock(micAnyText,micWithAnchorAbove,anchor).GetText()
-Datatable.Value("ticketID", dtGlobalSheet)=ticketID
-msgbox Datatable.Value("ticketID", dtGlobalSheet)
+If IsNull(ticketID) Then
+	reporter.ReportEvent micFail, "ticketID is null", "Fail to generate a ticket ID in SMAX"
+Else
+	reporter.ReportEvent micPass, "ticketID is not null", "Succeeed to generate a ticket ID in SMAX"
+	Datatable.Value("ticketID", dtGlobalSheet)=ticketID
+	print Datatable.Value("ticketID", dtGlobalSheet)
+End If
 
